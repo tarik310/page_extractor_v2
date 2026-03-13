@@ -1,0 +1,13 @@
+{
+  "manifest_version": 3,
+  "name": "Smart Page Extractor",
+  "version": "2.0",
+  "description": "Extract readable content as clean HTML or text.",
+  "permissions": ["activeTab", "scripting"],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  }
+}

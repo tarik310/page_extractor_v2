@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+  <head>
+    <style>
+      body {
+        font-family: Arial;
+        padding: 6px;
+        width: 230px;
+      }
+      button {
+        width: 100%;
+      }
+      .section {
+        margin-bottom: 10px;
+      }
+      label {
+        display: block;
+        margin: 4px 0;
+      }
+      .extract_btn {
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        padding: 20px 10px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <button id="extractBtn" class="extract_btn">Extract</button>
+    <div class="section">
+      <p>V4: 28_02_2026</p>
+      <strong>Content Scope</strong>
+      <label>
+        <input type="radio" name="scope" value="article" />
+        Article (Readability)
+      </label>
+      <label>
+        <input type="radio" name="scope" value="full" checked />
+        Full Page (DOM)
+      </label>
+    </div>
+
+    <div class="section">
+      <strong>Output Format</strong>
+      <label>
+        <input type="radio" name="format" value="html" />
+        HTML
+      </label>
+      <label>
+        <input type="radio" name="format" value="text" checked />
+        Text
+      </label>
+    </div>
+    <script src="popup.js"></script>
+  </body>
+</html>
