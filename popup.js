@@ -1,7 +1,27 @@
+document.addEventListener("DOMContentLoaded", () => {
+  const textarea = document.getElementById("userText");
+
+  // Load saved text
+  chrome.storage.local.get(
+    ["savedUserTextPageExtractorExtension"],
+    (result) => {
+      if (result.savedUserTextPageExtractorExtension) {
+        textarea.value = result.savedUserTextPageExtractorExtension;
+      }
+    },
+  );
+
+  // Save text whenever user types
+  textarea.addEventListener("input", (e) => {
+    chrome.storage.local.set({
+      savedUserTextPageExtractorExtension: e.target.value,
+    });
+  });
+});
 document.getElementById("extractBtn").addEventListener("click", async () => {
   const scope = document.querySelector('input[name="scope"]:checked').value;
   const format = document.querySelector('input[name="format"]:checked').value;
-
+  const userText = document.getElementById("userText").value;
   const [tab] = await chrome.tabs.query({
     active: true,
     currentWindow: true,
@@ -18,13 +38,13 @@ document.getElementById("extractBtn").addEventListener("click", async () => {
   await chrome.scripting.executeScript({
     target: { tabId: tab.id },
     func: extractContent,
-    args: [scope, format],
+    args: [scope, format, userText, tab.url],
   });
 
   window.close();
 });
 
-function extractContent(scope, format) {
+function extractContent(scope, format, userText, pageUrl) {
   let container;
 
   // =========================
@@ -156,6 +176,43 @@ function extractContent(scope, format) {
     } else {
       content = document.body.innerText.trim();
     }
+    // =========================
+    // HEADER BLOCK
+    // =========================
+
+    const now = new Date();
+
+    const formattedDate =
+      now.getFullYear() +
+      "-" +
+      String(now.getMonth() + 1).padStart(2, "0") +
+      "-" +
+      String(now.getDate()).padStart(2, "0") +
+      " " +
+      String(now.getHours()).padStart(2, "0") +
+      ":" +
+      String(now.getMinutes()).padStart(2, "0");
+
+    let headerParts = [];
+
+    // User text (saved notes)
+    if (userText && userText.trim() !== "") {
+      headerParts.push(userText.trim());
+    }
+
+    // Automatic metadata
+    headerParts.push(`Date: ${formattedDate}`);
+    headerParts.push(`URL: ${pageUrl}`);
+
+    // Combine header
+    const header = headerParts.join("\n\n");
+
+    // Separator
+    const separator =
+      "\n\nSEPARATOR_____________________________________________________________\n\n";
+
+    // Final content
+    content = header + separator + content;
 
     extension = "txt";
   }

@@ -29,7 +29,7 @@
   <body>
     <button id="extractBtn" class="extract_btn">Extract</button>
     <div class="section">
-      <p>V4: 28_02_2026</p>
+      <p>V5: 13_03_2026</p>
       <strong>Content Scope</strong>
       <label>
         <input type="radio" name="scope" value="article" />
@@ -51,6 +51,15 @@
         <input type="radio" name="format" value="text" checked />
         Text
       </label>
+    </div>
+    <div class="section">
+      <strong>Notes / Header Text</strong>
+      <textarea
+        id="userText"
+        rows="4"
+        style="width: 100%; resize: vertical"
+        placeholder="Type text to include at top of file..."
+      ></textarea>
     </div>
     <script src="popup.js"></script>
   </body>
