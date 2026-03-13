@@ -203,6 +203,7 @@ function extractContent(scope, format, userText, pageUrl) {
     // Automatic metadata
     headerParts.push(`Date: ${formattedDate}`);
     headerParts.push(`URL: ${pageUrl}`);
+    headerParts.push(`Page Title: ${title}`);
 
     // Combine header
     const header = headerParts.join("\n\n");
