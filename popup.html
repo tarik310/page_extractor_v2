@@ -27,9 +27,9 @@
     </style>
   </head>
   <body>
-    <button id="extractBtn" class="extract_btn">Extract</button>
+    <button id="extractBtn" class="extract_btn">EXTRACT</button>
     <div class="section">
-      <p>V5: 13_03_2026</p>
+      <p>V6: 19_03_2026</p>
       <strong>Content Scope</strong>
       <label>
         <input type="radio" name="scope" value="article" />
@@ -53,6 +53,30 @@
       </label>
     </div>
     <div class="section">
+      <strong>File Name Settings</strong>
+
+      <label>
+        Base Name:
+        <input
+          type="text"
+          id="baseName"
+          placeholder="Base name for file (without extension)"
+          style="width: 100%"
+        />
+      </label>
+
+      <label>
+        Next Serial Number:
+        <input
+          type="number"
+          id="serialNumber"
+          min="1"
+          step="1"
+          style="width: 100%"
+        />
+      </label>
+    </div>
+    <div class="section">
       <strong>Notes / Header Text</strong>
       <textarea
         id="userText"
@@ -61,6 +85,7 @@
         placeholder="Type text to include at top of file..."
       ></textarea>
     </div>
+
     <script src="popup.js"></script>
   </body>
 </html>

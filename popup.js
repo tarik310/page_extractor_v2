@@ -1,27 +1,59 @@
 document.addEventListener("DOMContentLoaded", () => {
   const textarea = document.getElementById("userText");
+  const baseNameInput = document.getElementById("baseName");
+  const serialInput = document.getElementById("serialNumber");
 
-  // Load saved text
+  // Load saved text and serial number
   chrome.storage.local.get(
-    ["savedUserTextPageExtractorExtension"],
+    [
+      "savedUserTextPageExtractorExtension",
+      "baseNameForDownload",
+      "nextSerialNumberForDownload",
+    ],
     (result) => {
       if (result.savedUserTextPageExtractorExtension) {
         textarea.value = result.savedUserTextPageExtractorExtension;
       }
+
+      if (result.baseNameForDownload) {
+        baseNameInput.value = result.baseNameForDownload;
+      }
+
+      serialInput.value = result.nextSerialNumberForDownload || 1;
     },
   );
 
-  // Save text whenever user types
+  // Save notes
   textarea.addEventListener("input", (e) => {
     chrome.storage.local.set({
       savedUserTextPageExtractorExtension: e.target.value,
+    });
+  });
+
+  // Save base name
+  baseNameInput.addEventListener("input", (e) => {
+    chrome.storage.local.set({
+      baseNameForDownload: e.target.value,
+    });
+  });
+
+  // Save serial number (user override)
+  serialInput.addEventListener("input", (e) => {
+    chrome.storage.local.set({
+      nextSerialNumberForDownload: Number(e.target.value),
     });
   });
 });
 document.getElementById("extractBtn").addEventListener("click", async () => {
   const scope = document.querySelector('input[name="scope"]:checked').value;
   const format = document.querySelector('input[name="format"]:checked').value;
+
   const userText = document.getElementById("userText").value;
+  const baseName = document.getElementById("baseName").value.trim();
+  const serialNumber = Number(
+    document.getElementById("serialNumber").value || 1,
+  );
+
   const [tab] = await chrome.tabs.query({
     active: true,
     currentWindow: true,
@@ -35,16 +67,29 @@ document.getElementById("extractBtn").addEventListener("click", async () => {
     });
   }
 
+  // Send baseName + serialNumber to page
   await chrome.scripting.executeScript({
     target: { tabId: tab.id },
     func: extractContent,
-    args: [scope, format, userText, tab.url],
+    args: [scope, format, userText, tab.url, baseName, serialNumber],
+  });
+
+  // Auto-increment serial number in storage
+  chrome.storage.local.set({
+    nextSerialNumberForDownload: serialNumber + 1,
   });
 
   window.close();
 });
 
-function extractContent(scope, format, userText, pageUrl) {
+function extractContent(
+  scope,
+  format,
+  userText,
+  pageUrl,
+  baseName,
+  serialNumber,
+) {
   let container;
 
   // =========================
@@ -222,7 +267,10 @@ function extractContent(scope, format, userText, pageUrl) {
   // DOWNLOAD
   // =========================
 
-  const filename = `${title}_${timestamp}.${extension}`;
+  // Use custom filename
+  const safeBase = (baseName || "file").replace(/[\\/:*?"<>|]/g, "").trim();
+
+  const filename = `${safeBase}_${serialNumber}.${extension}`;
 
   const blob = new Blob(["\uFEFF" + content], {
     type:
